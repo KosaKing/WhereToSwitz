@@ -1,0 +1,21 @@
+Project Requirements:
+
+Requirement 1: Fetching Weather Data
+
+The application should retrieve weather data from the [API provider's name] API.
+The data should include weather conditions at 9 am, 12 pm, 3 pm, 6 pm, and 9 pm for the current day.
+Requirement 2: Three-Day Weather Forecast
+
+The application should display a three-day weather forecast.
+For each day, it should provide both morning and afternoon weather conditions.
+Requirement 3: City-Based Weather Lookup
+
+Users should be able to search for weather conditions in a specific city.
+The application should support searching by city name.
+Users should view current weather information, including temperature and weather type.
+A slider should allow users to explore hourly weather changes for the selected day.
+Users can access a three-day weather forecast for the selected city.
+Requirement 4: Detailed Weather Information
+
+The application should have three tabs for today's weather: "Sunny," "Cloudy," and "Rainy/Snowy."
+Each tab should display detailed weather information, including temperature, wind speed, and humidity.

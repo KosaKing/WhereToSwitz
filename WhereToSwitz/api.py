@@ -30,6 +30,8 @@ canton_capital_dict = {
     "Zurich": "Zurich"
 }
 
+
+
 for key, val in canton_capital_dict.items():
     city_name = val
     limit = 1
@@ -41,13 +43,27 @@ for key, val in canton_capital_dict.items():
     weather_api_response = requests.get(weather_api)
     temp = weather_api_response.json()['main']['temp']
     weather = weather_api_response.json()['weather'][0]['main']
-    distinct_weather = weather_api_response.json()['weather'][0]['description'] 
+    distinct_weather = weather_api_response.json()['weather'][0]['description']
+    icon = weather_api_response.json()['weather'][0]['icon'] 
+    icon_URL = f'https://openweathermap.org/img/wn/{icon}@2x.png'
+    print(icon_URL)
+    icon_response = requests.get(icon_URL)
+    if icon_response.status_code == 200:
+        icon_data = icon_response.content
+    else:
+        print(f"Failed to fetch icon. Status code: {icon_response.status_code}")
+
     # TO DO - Confirm that is switz town 
     canton_capital_dict[key] = {'city_name': city_name,
                                 'temp': temp,
                                 'weather': weather,
-                                'distinct_weather': distinct_weather}
+                                'distinct_weather': distinct_weather,
+                                'icon': icon_data
+                                }
+    
     print(canton_capital_dict[key])
+    # Temporary 
+    break
     
     
     # api delivery - https://openweathermap.org
