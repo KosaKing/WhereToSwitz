@@ -1,5 +1,6 @@
 import requests
 import config
+import pandas as pd
 
 canton_capital_dict = {
     "Aargau": "Aarau",
@@ -30,9 +31,25 @@ canton_capital_dict = {
     "Zurich": "Zurich"
 }
 
+cantonal_data_dict = { 'Canton': [],
+                        'City': [],
+                        'Temperature': [],
+                        'Weather': [],
+                        'Distinct weather': [],
+                        'Icon': []
+                        }
+
+def update_cantonal_data_dict(dict, canton_name, city_name, temp, weather, distinct_weather, icon):
+    dict['Canton'].append(canton_name)
+    dict['City'].append(city_name)
+    dict['Temperature'].append(temp)
+    dict['Weather'].append(weather)
+    dict['Distinct weather'].append(distinct_weather)
+    dict['Icon'].append(icon)
 
 
 for key, val in canton_capital_dict.items():
+    canton_name = key
     city_name = val
     limit = 1
     loc_api_url = f'http://api.openweathermap.org/geo/1.0/direct?q={city_name}&limit={limit}&appid={config.API_key}'
@@ -54,18 +71,14 @@ for key, val in canton_capital_dict.items():
         print(f"Failed to fetch icon. Status code: {icon_response.status_code}")
 
     # TO DO - Confirm that is switz town 
-    canton_capital_dict[key] = {'city_name': city_name,
-                                'temp': temp,
-                                'weather': weather,
-                                'distinct_weather': distinct_weather,
-                                'icon': icon_data
-                                }
-    
-    print(canton_capital_dict[key])
-    # Temporary 
-    break
-    
-    
+    update_cantonal_data_dict(cantonal_data_dict, canton_name, city_name, temp, weather, distinct_weather, icon_URL)
+
+    # print(cantonal_data_dict)
+    # # Temporary 
+    # break
+
+cantonal_data_df = pd.DataFrame(cantonal_data_dict)
+
     # api delivery - https://openweathermap.org
      
     # Start work on a different branch

@@ -1,0 +1,313 @@
+From 5a37305fe5692189b232f60301d098fd84dfcf48 Mon Sep 17 00:00:00 2001
+From: KosaKing <Filip.Kosowski@interia.pl>
+Date: Tue, 21 Nov 2023 21:39:19 +0100
+Subject: [PATCH] Refactor data collection and add weather overview table plot
+
+- Restructured the data collection: Previously, data was stored in a dictionary where each key represented a canton, and the values were dictionaries containing details. Modified the structure to have keys like 'cantons' and other values as a list. Each list element corresponds to the data of a new canton. This change facilitates the conversion of data into a DataFrame, essential for table representation in Streamlit.
+
+- Added a new table plot: Implemented a table plot providing an overview of weather data for every canton in Switzerland. This visual representation enhances the understanding of weather patterns across different regions.
+---
+ 1.png                                         | Bin 0 -> 1869 bytes
+ .../__pycache__/hello.cpython-310.pyc         | Bin 0 -> 184 bytes
+ WhereToStwitz-FLASK/hello.py                  |   0
+ .../WhereToSwitz}/.gitignore                  |   0
+ .../__pycache__/api.cpython-310.pyc           | Bin 0 -> 2226 bytes
+ .../__pycache__/config.cpython-310.pyc        | Bin
+ .../WhereToSwitz}/api.py                      |  37 ++++++++++++------
+ .../WhereToSwitz}/main.py                     |  29 ++++++++++----
+ WhereToStwitz-STREAMLIT/tests/ex.py           |  10 +++++
+ WhereToSwitz/__pycache__/api.cpython-310.pyc  | Bin 1783 -> 0 bytes
+ 10 files changed, 56 insertions(+), 20 deletions(-)
+ create mode 100644 1.png
+ create mode 100644 WhereToStwitz-FLASK/__pycache__/hello.cpython-310.pyc
+ create mode 100644 WhereToStwitz-FLASK/hello.py
+ rename {WhereToSwitz => WhereToStwitz-STREAMLIT/WhereToSwitz}/.gitignore (100%)
+ create mode 100644 WhereToStwitz-STREAMLIT/WhereToSwitz/__pycache__/api.cpython-310.pyc
+ rename {WhereToSwitz => WhereToStwitz-STREAMLIT/WhereToSwitz}/__pycache__/config.cpython-310.pyc (100%)
+ rename {WhereToSwitz => WhereToStwitz-STREAMLIT/WhereToSwitz}/api.py (70%)
+ rename {WhereToSwitz => WhereToStwitz-STREAMLIT/WhereToSwitz}/main.py (65%)
+ create mode 100644 WhereToStwitz-STREAMLIT/tests/ex.py
+ delete mode 100644 WhereToSwitz/__pycache__/api.cpython-310.pyc
+
+diff --git a/1.png b/1.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..9c64ea86b6a93c7fd61543c696956b0657454fe9
+GIT binary patch
+literal 1869
+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
+C6J&<~
+
+literal 0
+HcmV?d00001
+
+diff --git a/WhereToStwitz-FLASK/__pycache__/hello.cpython-310.pyc b/WhereToStwitz-FLASK/__pycache__/hello.cpython-310.pyc
+new file mode 100644
+index 0000000000000000000000000000000000000000..27ab7c1b20d5cf3219eb4135a1fe3e394f588d0b
+GIT binary patch
+literal 184
+zcmd1j<>g`kf`{`2QbF`%5P=LBfgA@QE@lA|DGb33nv8xc8Hzx{2;x_?vsFxJacWU<
+zjERMrrAdrSYH@Z+enE_LaB)d#N@i+tOaM?aKQA#SpeR2pHMyiXCOjjxC^aNMxID9@
+q3eG73@pRpM9D}`MGE#GL^7RTTZ*kb<=BJeAq}qWjEoK4|EDQi5b}xMZ
+
+literal 0
+HcmV?d00001
+
+diff --git a/WhereToStwitz-FLASK/hello.py b/WhereToStwitz-FLASK/hello.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/WhereToSwitz/.gitignore b/WhereToStwitz-STREAMLIT/WhereToSwitz/.gitignore
+similarity index 100%
+rename from WhereToSwitz/.gitignore
+rename to WhereToStwitz-STREAMLIT/WhereToSwitz/.gitignore
+diff --git a/WhereToStwitz-STREAMLIT/WhereToSwitz/__pycache__/api.cpython-310.pyc b/WhereToStwitz-STREAMLIT/WhereToSwitz/__pycache__/api.cpython-310.pyc
+new file mode 100644
+index 0000000000000000000000000000000000000000..b9a68831b7fb68a634e2abb20d725b8f5f438fc2
+GIT binary patch
+literal 2226
+zcmZ`(TW{1x6t-t)?Y(Eoja*^51p;IjLZFZ~g^(1QDoqg^pt3?&gJ-hq;I)_Wm^3Ti
+z+Sfky5s;Efec(Uz4OQw(e?aH85)x0n-$HL^oZTd)tw;Xs@64QU&N)6FKbuWyaDAD(
+z%|1_S+SiKgzQCqkf;)JoYZ}$4?rPT7Q@8YpBP-@;6w%nnI>j^&XiyU{L6d+fng-0!
+z3}BXK0dq75*g-o0^K=hjC+!04rrm%&v<I-4?gi|l{eS~>0C12F0uIq(x{vOs1$uxU
+zq=)EXdgM{^Q{BQ<ZD-JtM}`%rN9nN-HOpXl-Q3V-wc8&pAuC}eS;9)Oq?M+lR)!vD
+z>4zFU!7_j+nZA;Js695U9Mjf2SZ+hN@+`l;X9M!>*XUTkW_9l3Mc`eu#5%$E6zkei
+zpr;?3R(GV)4H`YHC(;-PjWgiW+u{?zl`hz=y)W6$g01f*+c~iH(^ptO>~#Kd%o<>W
+zY~TZ3*P@*UV5cEAv@%RD+(rB=c-v>~_Y!Q7PAV(pg`%|vi?b9<vtG8B^?|>sYxmw`
+zvGoFrgTeu-m$lJXpQ{d7kj6CORT9cLJW1H>oo+Ok*JQ3+m=1%0abEK&^Q8GE<4ynz
+zdUh7fdEWMXa@*X@UnT)_$L5Jg1G`3+g*4|K76{@t(_2$zL8y@Nh)8^yaZe_$aOaL6
+z@~SkhGLPLS@N@|egHSc+RS50Q)6YB=37)BiT;jJvuq9z`mbp)#)O}BF6WXA~Le=dH
+zEVOG+KM~B8$pwe55?49LVQVjtiFfX_3`UuNhbJ>-73y-0gaI%E*y>tSCd<C-3)s)w
+zOqE5kaFw_&OsB5E-ppHOE|savP%Fo4`W}(yv@593mnAMcKIAkHY6OZTV^#=>Ss{1q
+z+GvvZKzzIxK$?pnuF7vLI=18aGIoPI(zr=n;sg@kBq8NPYV|O{s3DCR;t7z(Gmco3
+z=|xs=Fiu3snKW-PB5I6p=4YKiIG!yEt6LU{=WO4zO^|3`>OBVc4BWxH01x1=@7LC~
+z2l@td8!!|x)MBxS#aawU47XT3V$fNUpAj)bF{(kInG5_7=<~x0jwl#Wa8$uDfKgo<
+zMD-jUH6^BwEo9n`lB{^7&ScVtOt)UKfOMtV&MHq^c~;sM>_DDRG=3U%H&<pRmu^4<
+z2TK#@&s~^Unq|RV;Ww6M%7F+eH007Xn1s*fUgQ1>vqi9U3(Ch9{qm|Kn%hJuHdbD|
+z{>Jp%^K*;a_Gl4lIK{@A><=512v*q&oVXQWq@t2J4xt1YfSleQojN}QhUakBYRytj
+zh{j~8q=bB^LMxRzX%u~4EmfIcI$b<fq7H`$FW#GKnj@}LcZ7O@vN?20##|x*e6Km7
+z#Df1<Q&E-1i)Tx%T`q#>R5LyTzEjQYNa#5tn5r`YZ7Ok{I36E^7<myurYQ?-?lc5+
+zHb138KiJ;wKjL=k)zYe0YMPhE-!C@2>hmv@$Du34aTzTLzp%`NT`Q>XRV=_iDZ-#&
+z!$C7y7(FNxoZSoIzzC!P^UDtWIt@5XNFY&z%C1&-*ibS!Q=%%%&VN@vDzc0_&@_RJ
+z-DPVscAvQXgv#io$|xQc5`Nlia}_n6c73}7qLq-lGFD|m=Gzv|f`;z}OyU*j7=Bi1
+zoKqU<Rwb36?A}ExZI_)A@{)2>rIQJjc;&|Rc^PkT2ac|6WN7=yG@O=Dl8P#cG-0h^
+zuqYWVQXf$!X93|9f*&ORQtHc5`|pDBXvf#;J`G*=y6U>%5kNvq=m{MmtfRj$LVw~I
+z`U7M1JC36l*g%`uM8Dw#`V}Y9FF1vM#%c5u&Y&N07X5&8=zH9OzQcL+E#8B^L7hnd
+q=SVz5!#ft^MIw<;VqJ|sJ*DSi3`EavU5yMxl7f-Y^QbqLGyVqN@tczX
+
+literal 0
+HcmV?d00001
+
+diff --git a/WhereToSwitz/__pycache__/config.cpython-310.pyc b/WhereToStwitz-STREAMLIT/WhereToSwitz/__pycache__/config.cpython-310.pyc
+similarity index 100%
+rename from WhereToSwitz/__pycache__/config.cpython-310.pyc
+rename to WhereToStwitz-STREAMLIT/WhereToSwitz/__pycache__/config.cpython-310.pyc
+diff --git a/WhereToSwitz/api.py b/WhereToStwitz-STREAMLIT/WhereToSwitz/api.py
+similarity index 70%
+rename from WhereToSwitz/api.py
+rename to WhereToStwitz-STREAMLIT/WhereToSwitz/api.py
+index 21fb2cd..e174951 100644
+--- a/WhereToSwitz/api.py
++++ b/WhereToStwitz-STREAMLIT/WhereToSwitz/api.py
+@@ -1,5 +1,6 @@
+ import requests
+ import config
++import pandas as pd
+ 
+ canton_capital_dict = {
+     "Aargau": "Aarau",
+@@ -30,9 +31,25 @@ canton_capital_dict = {
+     "Zurich": "Zurich"
+ }
+ 
++cantonal_data_dict = { 'Canton': [],
++                        'City': [],
++                        'Temperature': [],
++                        'Weather': [],
++                        'Distinct weather': [],
++                        'Icon': []
++                        }
++
++def update_cantonal_data_dict(dict, canton_name, city_name, temp, weather, distinct_weather, icon):
++    dict['Canton'].append(canton_name)
++    dict['City'].append(city_name)
++    dict['Temperature'].append(temp)
++    dict['Weather'].append(weather)
++    dict['Distinct weather'].append(distinct_weather)
++    dict['Icon'].append(icon)
+ 
+ 
+ for key, val in canton_capital_dict.items():
++    canton_name = key
+     city_name = val
+     limit = 1
+     loc_api_url = f'http://api.openweathermap.org/geo/1.0/direct?q={city_name}&limit={limit}&appid={config.API_key}'
+@@ -54,18 +71,14 @@ for key, val in canton_capital_dict.items():
+         print(f"Failed to fetch icon. Status code: {icon_response.status_code}")
+ 
+     # TO DO - Confirm that is switz town 
+-    canton_capital_dict[key] = {'city_name': city_name,
+-                                'temp': temp,
+-                                'weather': weather,
+-                                'distinct_weather': distinct_weather,
+-                                'icon': icon_data
+-                                }
+-    
+-    print(canton_capital_dict[key])
+-    # Temporary 
+-    break
+-    
+-    
++    update_cantonal_data_dict(cantonal_data_dict, canton_name, city_name, temp, weather, distinct_weather, icon_URL)
++
++    # print(cantonal_data_dict)
++    # # Temporary 
++    # break
++
++cantonal_data_df = pd.DataFrame(cantonal_data_dict)
++
+     # api delivery - https://openweathermap.org
+      
+     # Start work on a different branch
+diff --git a/WhereToSwitz/main.py b/WhereToStwitz-STREAMLIT/WhereToSwitz/main.py
+similarity index 65%
+rename from WhereToSwitz/main.py
+rename to WhereToStwitz-STREAMLIT/WhereToSwitz/main.py
+index 10dbf53..f1c7f26 100644
+--- a/WhereToSwitz/main.py
++++ b/WhereToStwitz-STREAMLIT/WhereToSwitz/main.py
+@@ -1,6 +1,9 @@
+ import streamlit as st
+ from PIL import Image
+ import api
++import pandas as pd
++import numpy as np
++import random
+ 
+ map = Image.open(r"C:\Users\48694\Desktop\CSstudies\PersonalProjects\WhereToSwitz\SwitzCantons.jpg")
+ 
+@@ -11,20 +14,30 @@ st.image(map)
+ 
+ 
+ 
+-tab1, tab2, tab3 = st.tabs(["Sun", "Clouds", "Rain"])
+-    
++tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Sun", "Clouds", "Rain"])
++
+ with tab1:
++   st.header("Overview")
++   st.dataframe(
++      api.cantonal_data_df,
++      column_config={
++      "Icon": st.column_config.ImageColumn(),
++      },
++      hide_index=True,
++      use_container_width=True,
++      height=945,
++   )
++
++
++with tab2:
+    st.header("Sun")
+-   st.write(api.canton_capital_dict['Aargau']['temp'],
+-            api.canton_capital_dict['Aargau']['weather'],
+-            api.canton_capital_dict['Aargau']['distinct_weather'],
+-            st.image(api.icon_data))
++   # 20/
+    
+ 
+-with tab2:
++with tab3:
+    st.header("Clouds")
+ 
+-with tab3:
++with tab4:
+    st.header("Rain/Snow")
+ 
+ 
+diff --git a/WhereToStwitz-STREAMLIT/tests/ex.py b/WhereToStwitz-STREAMLIT/tests/ex.py
+new file mode 100644
+index 0000000..8b5c7fc
+--- /dev/null
++++ b/WhereToStwitz-STREAMLIT/tests/ex.py
+@@ -0,0 +1,10 @@
++import pandas as pd
++
++p = {'a': [1, 2, 3, 4, 5],
++     'b': [11, 22, 33, 44, 55],
++     'c': [111, 222, 333, 444, 555]}
++
++
++
++df = pd.DataFrame(p)
++print(df)
+\ No newline at end of file
+diff --git a/WhereToSwitz/__pycache__/api.cpython-310.pyc b/WhereToSwitz/__pycache__/api.cpython-310.pyc
+deleted file mode 100644
+index 36b026578ca782f7946c15a80eb29eb1db5292b8..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+HcmV?d00001
+
+literal 1783
+zcmZ`&TaOe)6z;C6?w;%J>=kxV89`T9Wd?9TAgr)JK+FaS1DI6SOo~3WGqv<o57pJI
+zJFor(5?_D>G(PYjd?O*g`r2>C#AKhmiy~f54ZGZ;-RZCToI2+_mpT<!Dn$pM)z9z4
+z*9FJ<)(THQB@~Y0m)vt52OMxChdo+d=1K<$<gU3u!9(;RK+Hn{u?Qu^GL#W3P(d7m
+zA;e)AMy$dJ;wX$Ej>9<O1WX`K!WP7>Foie`(}>$(8{!M_BD@6Kp$0F*4%i8=z^gY3
+zU$~42aw~V+IpKVCZHX|-JmE1PW>^5P3IDnSuZsY2R=6wq>&{J|6@+uEC<?b-RuZLK
+z<=a@vlml-}Ijr)O{3gmn@Rq2c?=CU)gaPU|12#P17)Fk&s17(9$gvxJMmFR<C|h3C
+zv(e{tdr>#`obGMZjl-N6$4L8b=GcUo6ceAgt}}=<fswX|Eh}4L|7D`@;olUSR(UZA
+z?^rF?MFzIM7!jjlOiaUp8=fG79(Iri*D1&DyLfiZ!8dzw-JbB7%wOQT%~R&#%G3Vj
+zLa!%OUqn%DAx#pYbteX)Sn!_EGC_lhCkCgLdc0qFtnOEj@kB(s7P*2X?C@p7f<-A3
+z!=rxb(N@!NFw7eWj2;tOvHVFbFU6^DGyjxO;wr~A;yO)IJA9`wwM%!uR5lZOypw81
+z-%nA8!|I$6(cL@USlKXXh+HDI(|ksxVdw5=MntS|M#3tOth0xqRl@QgT-s3hO^zOl
+zm76xz<ql61lzfy{*ZNtZ8Aq|fc<Mp1Y3j98Jc@9;coJg^wJaiF#bekjsrs?vELeyP
+z#Cn<0ri`(sMP%dHq%6nMcILBG%dj(B&^gRcQv?>AM{?VK|GW&PidpW0mdwA%BQ6t0
+zFY*+$XRUpNb-aB}ztJ(Kcc{_eJz0<OtX2g#9ih9tSC4hO(H3!IPkna-q!yt$a%H|B
+z%tW#)js4-ho`m@<7jc6StNxrNOa7k?xZ#bx^?i+vC`Zt9zVFST?|i>9lPYPF`K~Zn
+zSVp^Cs*D=Z?PbA+eO3aIgj)6tHYB4m#F#raWBy0>vfFN~szyIJy7%LHPqo*-vL)|4
+z$z>#<X5!kiFkz==dFnMhOOqzG5C`;7ZPv>Qp)_kP#k)e=q0wc8tO_zQQiZ0qk&+%l
+z_3XARuf>%V$1=%$WLuW)Y%Ju;#HtlyYjIjzAVZUR5(`SQ+-0$r<*xEbS1qeIXlWKK
+zoITyb9af6su!U}|R7Y8^Eexw}YP3jtu}VZnSCUxiyv@wcEh}v#Wc}FqQ$lOg<w+TO
+z#JbtcS>6`kx^QkW^Lkq1*jEOMO`oiUHx1j;vTex%v^7GRtS~UL$9c!mHA`mU!MWpy
+zmM-8ePnPBm>_0fSbV4MTP25{L-b_picx#u=;wH{^bXLbJI8e#bhd6BFeB4}>rvI#9
+zC$hJe<qvmbNF(vC9oOVjguIh?3860ehZ6EP&5^$-B@d}b{-i#6Km+mz&6D40f!wD>
+z@*6FYUul{ALM!BFIz)b=!{kR=B|p#+@;w<P?z3<HyXto8Qg^FcbgTGI57u$lzGXL$
+TQW3FANN&@w_^=%Kgnsicza$fZ
+
+-- 
+2.33.1.windows.1
+

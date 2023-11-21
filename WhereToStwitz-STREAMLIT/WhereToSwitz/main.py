@@ -1,6 +1,9 @@
 import streamlit as st
 from PIL import Image
 import api
+import pandas as pd
+import numpy as np
+import random
 
 map = Image.open(r"C:\Users\48694\Desktop\CSstudies\PersonalProjects\WhereToSwitz\SwitzCantons.jpg")
 
@@ -11,20 +14,30 @@ st.image(map)
 
 
 
-tab1, tab2, tab3 = st.tabs(["Sun", "Clouds", "Rain"])
-    
+tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Sun", "Clouds", "Rain"])
+
 with tab1:
-   st.header("Sun")
-   st.write(api.canton_capital_dict['Aargau']['temp'],
-            api.canton_capital_dict['Aargau']['weather'],
-            api.canton_capital_dict['Aargau']['distinct_weather'],
-            st.image(api.icon_data))
-   
+   st.header("Overview")
+   st.dataframe(
+      api.cantonal_data_df,
+      column_config={
+      "Icon": st.column_config.ImageColumn(),
+      },
+      hide_index=True,
+      use_container_width=True,
+      height=945,
+   )
+
 
 with tab2:
-   st.header("Clouds")
+   st.header("Sun")
+   # 20/
+   
 
 with tab3:
+   st.header("Clouds")
+
+with tab4:
    st.header("Rain/Snow")
 
 
