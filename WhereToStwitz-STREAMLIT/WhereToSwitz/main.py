@@ -1,10 +1,7 @@
 import streamlit as st
 from PIL import Image
 import api
-import pandas as pd
-import numpy as np
 from datetime import datetime
-import random
 
 map = Image.open(r"C:\Users\48694\Desktop\CSstudies\PersonalProjects\WhereToSwitz\SwitzCantons.jpg")
 HOURS = ('6:00', '9:00', '12:00', '15:00', '18:00', '21:00')
