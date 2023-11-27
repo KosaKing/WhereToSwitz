@@ -5,6 +5,7 @@ from datetime import datetime
 
 map = Image.open(r"C:\Users\48694\Desktop\CSstudies\PersonalProjects\WhereToSwitz\SwitzCantons.jpg")
 HOURS = ('6:00', '9:00', '12:00', '15:00', '18:00', '21:00')
+cantonal_data_df = api.fetch_cantonal_data_from_api()
 
 st.title('WhereToSwitz - Where is a good weather in Switzerland!')
 st.subheader('Map of Switzerland Cantons')
@@ -29,9 +30,11 @@ weather_option = st.selectbox(
    ('-', 'Sun', 'Clouds', 'Rain/Snow'))
 # https://openweathermap.org/weather-conditions - this data are going to be helpful to map it all 
 
+st.button("Apply filters", type="primary")
+
 st.header("Overview")
 st.dataframe(
-   api.cantonal_data_df,
+   cantonal_data_df,
    column_config={
    "Icon": st.column_config.ImageColumn(),
    },
@@ -40,6 +43,8 @@ st.dataframe(
    height=945,
 )
 
+# TO DO !!! - There is some problem with cached data - it might be realted data function doesn't return data but it modifies an exsisting object - check it out.
+print(cantonal_data_df)
 
 # for key, val in api.canton_capital_dict.items():
 #     st.write(key, val)

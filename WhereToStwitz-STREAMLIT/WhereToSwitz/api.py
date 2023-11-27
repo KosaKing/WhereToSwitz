@@ -41,7 +41,27 @@ cantonal_data_dict = { 'Canton': [],
                         'Icon': []
                         }
 
-def update_cantonal_data_dict(dict, canton_name, city_name, temp, weather, distinct_weather, icon):
+def update_cantonal_data_dict(dict: dict, canton_name: str, city_name: str, temp: str, weather: str, distinct_weather: str, icon: str) -> None:
+    """
+    Updates a dictionary containing cantonal weather data with new information.
+
+    This function appends data for a specific canton to the provided dictionary.
+
+    Parameters:
+    - data_dict (dict): The dictionary containing cantonal weather data.
+    - canton_name (str): The name of the canton.
+    - city_name (str): The name of the city in the canton.
+    - temp (str): The temperature in the city.
+    - weather (str): The general weather condition.
+    - distinct_weather (str): A distinct weather description.
+    - icon (str): The icon representing the weather.
+
+    Returns:
+    - None: The function modifies the provided dictionary in place.
+
+    Note:
+    The function appends data to the specified dictionary. Make sure to initialize the dictionary appropriately before using this function.
+    """
     dict['Canton'].append(canton_name)
     dict['City'].append(city_name)
     dict['Temperature'].append(temp)
@@ -50,7 +70,10 @@ def update_cantonal_data_dict(dict, canton_name, city_name, temp, weather, disti
     dict['Icon'].append(icon)
 
 @st.cache_data(ttl=10800)
-def fetch_cantonal_data_from_api():
+def fetch_cantonal_data_from_api() -> pd.DataFrame:
+    '''
+    Add 
+    '''
     for key, val in canton_capital_dict.items():
         canton_name = key
         city_name = val
@@ -66,6 +89,7 @@ def fetch_cantonal_data_from_api():
         distinct_weather = weather_api_response.json()['weather'][0]['description']
         icon = weather_api_response.json()['weather'][0]['icon'] 
         icon_URL = f'https://openweathermap.org/img/wn/{icon}@2x.png'
+        # TO DO: Consider if icon information may increase a fetching data time -> if it does use different solution 
         print(icon_URL)
         icon_response = requests.get(icon_URL)
         if icon_response.status_code == 200:
@@ -79,13 +103,13 @@ def fetch_cantonal_data_from_api():
         # print(cantonal_data_dict)
         # # Temporary 
         # break
+    return pd.DataFrame(cantonal_data_dict)
 
-fetch_cantonal_data_from_api()
 
-cantonal_data_df = pd.DataFrame(cantonal_data_dict)
 
-    # api delivery - https://openweathermap.org
-     
-    # Start work on a different branch
-    # READ IT https://www.dataquest.io/blog/python-api-tutorial/
+
+
+# api delivery - https://openweathermap.org
+# Start work on a different branch
+# READ IT https://www.dataquest.io/blog/python-api-tutorial/
    
